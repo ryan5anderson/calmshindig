@@ -9,18 +9,18 @@ export default function WaveDivider() {
 
   useGSAP((gsap, ScrollTrigger) => {
     return gsap.context(() => {
-      // Animate the wave container upward as user scrolls
+      // Start with wave hidden below (translated down), then swoosh upward as user scrolls
       gsap.fromTo(
         containerRef.current,
-        { yPercent: 0 },
+        { yPercent: 80 }, // Start mostly hidden below
         {
-          yPercent: -100,
-          ease: 'none',
+          yPercent: 0, // Swoosh up to full visibility
+          ease: 'power2.out',
           scrollTrigger: {
-            trigger: containerRef.current?.parentElement, // Hero section is the trigger
+            trigger: containerRef.current?.parentElement?.parentElement, // Hero section
             start: 'top top',
             end: 'bottom top',
-            scrub: true,
+            scrub: 1.5,
             markers: false,
           },
         }
@@ -30,52 +30,51 @@ export default function WaveDivider() {
     }, containerRef)
   })
 
-  const generateWavePath = (amplitude: number) => {
-    const points = []
+  // Wave path that curves upward into the Hero section, filled with sage color
+  const generateWavePath = (amplitude: number, offset: number = 0) => {
     const width = 1440
-    const height = 120
-    const frequency = 0.015
+    const height = 150
+    const frequency = 0.004
 
-    points.push(`M 0 ${height / 2}`)
-
-    for (let x = 0; x <= width; x += 20) {
-      const y = height / 2 + Math.sin(x * frequency) * amplitude
-      points.push(`L ${x} ${y}`)
+    // Start at bottom-left corner
+    let path = `M 0 ${height}`
+    
+    // Draw wave line from left to right (curves upward into hero)
+    for (let x = 0; x <= width; x += 10) {
+      const y = height - 20 - Math.sin((x + offset) * frequency * Math.PI) * amplitude
+      path += ` L ${x} ${y}`
     }
+    
+    // Close path: go to bottom-right, then back to bottom-left
+    path += ` L ${width} ${height} L 0 ${height} Z`
 
-    points.push(`L ${width} 0`)
-    points.push(`L 0 0`)
-    points.push('Z')
-
-    return points.join(' ')
+    return path
   }
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-32 overflow-hidden bg-gradient-to-b from-cream via-cream to-[#c4d6b4] pointer-events-none"
+      className="relative w-full h-[150px] pointer-events-none"
       aria-hidden
     >
       <svg
         ref={waveRef}
-        viewBox="0 0 1440 120"
+        viewBox="0 0 1440 150"
         preserveAspectRatio="none"
         className="absolute inset-0 w-full h-full"
       >
+        {/* Layered waves for depth - sage green color matching PerformanceInfo section */}
         <path
-          d={generateWavePath(12)}
-          fill="rgba(196, 214, 180, 0.4)"
-          className="will-change-[d]"
+          d={generateWavePath(25, 200)}
+          fill="rgba(196, 214, 180, 0.5)"
         />
         <path
-          d={generateWavePath(8)}
-          fill="rgba(196, 214, 180, 0.6)"
-          className="will-change-[d]"
+          d={generateWavePath(35, 100)}
+          fill="rgba(196, 214, 180, 0.7)"
         />
         <path
-          d={generateWavePath(16)}
+          d={generateWavePath(45, 0)}
           fill="#c4d6b4"
-          className="will-change-[d]"
         />
       </svg>
     </div>
