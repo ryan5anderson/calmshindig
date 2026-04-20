@@ -5,23 +5,81 @@ import { useGSAP } from '@/hooks/useGSAP'
 
 export default function WaveDivider() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const waveRef = useRef<SVGSVGElement>(null)
+  const wave1Ref = useRef<SVGPathElement>(null)
+  const wave2Ref = useRef<SVGPathElement>(null)
+  const wave3Ref = useRef<SVGPathElement>(null)
+
+  // Generate a more dynamic, multi-frequency wave path
+  const generateWavePath = (amplitude: number, frequency: number, phase: number = 0) => {
+    const width = 1440
+    const height = 200
+    const baseY = height - 30
+
+    let path = `M 0 ${height}`
+    
+    for (let x = 0; x <= width; x += 5) {
+      // Combine multiple sine waves for more organic, dynamic shape
+      const wave1 = Math.sin((x * frequency + phase) * Math.PI / 180) * amplitude
+      const wave2 = Math.sin((x * frequency * 2.5 + phase * 1.5) * Math.PI / 180) * (amplitude * 0.3)
+      const wave3 = Math.sin((x * frequency * 0.5 + phase * 0.7) * Math.PI / 180) * (amplitude * 0.5)
+      
+      const y = baseY - wave1 - wave2 - wave3
+      path += ` L ${x} ${y}`
+    }
+    
+    path += ` L ${width} ${height} L 0 ${height} Z`
+    return path
+  }
 
   useGSAP((gsap, ScrollTrigger) => {
     return gsap.context(() => {
-      // Start with wave hidden below (translated down), then swoosh upward as user scrolls
+      const heroSection = containerRef.current?.closest('section')
+      
+      // Animate wave paths from high amplitude to flat as user scrolls
+      // Wave 1 - back layer
       gsap.fromTo(
-        containerRef.current,
-        { yPercent: 80 }, // Start mostly hidden below
+        wave1Ref.current,
+        { attr: { d: generateWavePath(70, 0.8, 0) } },
         {
-          yPercent: 0, // Swoosh up to full visibility
-          ease: 'power2.out',
+          attr: { d: generateWavePath(8, 0.8, 0) },
+          ease: 'none',
           scrollTrigger: {
-            trigger: containerRef.current?.parentElement?.parentElement, // Hero section
+            trigger: heroSection,
             start: 'top top',
             end: 'bottom top',
-            scrub: 1.5,
-            markers: false,
+            scrub: 1.2,
+          },
+        }
+      )
+
+      // Wave 2 - middle layer
+      gsap.fromTo(
+        wave2Ref.current,
+        { attr: { d: generateWavePath(55, 1.2, 120) } },
+        {
+          attr: { d: generateWavePath(5, 1.2, 120) },
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroSection,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1,
+          },
+        }
+      )
+
+      // Wave 3 - front layer
+      gsap.fromTo(
+        wave3Ref.current,
+        { attr: { d: generateWavePath(45, 1.5, 240) } },
+        {
+          attr: { d: generateWavePath(3, 1.5, 240) },
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroSection,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 0.8,
           },
         }
       )
@@ -30,51 +88,35 @@ export default function WaveDivider() {
     }, containerRef)
   })
 
-  // Wave path that curves upward into the Hero section, filled with sage color
-  const generateWavePath = (amplitude: number, offset: number = 0) => {
-    const width = 1440
-    const height = 150
-    const frequency = 0.004
-
-    // Start at bottom-left corner
-    let path = `M 0 ${height}`
-    
-    // Draw wave line from left to right (curves upward into hero)
-    for (let x = 0; x <= width; x += 10) {
-      const y = height - 20 - Math.sin((x + offset) * frequency * Math.PI) * amplitude
-      path += ` L ${x} ${y}`
-    }
-    
-    // Close path: go to bottom-right, then back to bottom-left
-    path += ` L ${width} ${height} L 0 ${height} Z`
-
-    return path
-  }
-
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[150px] pointer-events-none"
+      className="relative w-full h-[200px] pointer-events-none overflow-visible"
       aria-hidden
     >
       <svg
-        ref={waveRef}
-        viewBox="0 0 1440 150"
+        viewBox="0 0 1440 200"
         preserveAspectRatio="none"
         className="absolute inset-0 w-full h-full"
       >
-        {/* Layered waves for depth - sage green color matching PerformanceInfo section */}
+        {/* Layered waves - start with high amplitude, flatten on scroll */}
         <path
-          d={generateWavePath(25, 200)}
-          fill="rgba(196, 214, 180, 0.5)"
+          ref={wave1Ref}
+          d={generateWavePath(70, 0.8, 0)}
+          fill="rgba(196, 214, 180, 0.4)"
+          className="will-change-[d]"
         />
         <path
-          d={generateWavePath(35, 100)}
+          ref={wave2Ref}
+          d={generateWavePath(55, 1.2, 120)}
           fill="rgba(196, 214, 180, 0.7)"
+          className="will-change-[d]"
         />
         <path
-          d={generateWavePath(45, 0)}
+          ref={wave3Ref}
+          d={generateWavePath(45, 1.5, 240)}
           fill="#c4d6b4"
+          className="will-change-[d]"
         />
       </svg>
     </div>
