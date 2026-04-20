@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 import { useGSAP } from '@/hooks/useGSAP'
 
 export default function WaveDivider() {
@@ -9,17 +9,39 @@ export default function WaveDivider() {
   const wave2Ref = useRef<SVGPathElement>(null)
   const wave3Ref = useRef<SVGPathElement>(null)
 
-  // Generate smooth, rounded wave path using a single sine wave
-  const generateWavePath = (amplitude: number, frequency: number, phase: number = 0) => {
+  // Generate organic wave with random variation - always connected at baseline
+  const generateWavePath = (
+    amplitude: number,
+    baseFrequency: number,
+    phaseOffset: number,
+    seed: number
+  ) => {
     const width = 1440
     const height = 200
-    const baseY = height - 20
+    const baseY = height // Waves grow upward from the very bottom
+    
+    // Seeded random for consistent randomness per layer
+    const seededRandom = (n: number) => {
+      const x = Math.sin(seed + n * 9999) * 10000
+      return x - Math.floor(x)
+    }
 
     let path = `M 0 ${height}`
     
     for (let x = 0; x <= width; x += 5) {
-      // Single smooth sine wave for rounded, flowing shape
-      const y = baseY - Math.sin((x * frequency + phase) * Math.PI / 180) * amplitude
+      // Combine multiple frequencies for organic feel
+      const mainWave = Math.sin((x * baseFrequency + phaseOffset) * Math.PI / 180)
+      const secondaryWave = Math.sin((x * baseFrequency * 0.5 + phaseOffset * 1.3) * Math.PI / 180) * 0.3
+      const tertiaryWave = Math.sin((x * baseFrequency * 1.7 + phaseOffset * 0.7) * Math.PI / 180) * 0.15
+      
+      // Add subtle randomness that varies along the wave
+      const randomVariation = seededRandom(Math.floor(x / 50)) * 0.2 - 0.1
+      
+      // Combined wave value (0 to 1 range, always positive = always connected)
+      const combinedWave = (mainWave + secondaryWave + tertiaryWave + randomVariation + 1) / 2
+      
+      // Wave grows upward from baseline - never disconnects
+      const y = baseY - combinedWave * amplitude
       path += ` L ${x} ${y}`
     }
     
@@ -27,31 +49,49 @@ export default function WaveDivider() {
     return path
   }
 
+  // Memoize seeds for consistent randomness
+  const seeds = useMemo(() => [1.234, 5.678, 9.012], [])
+
   useGSAP((gsap, ScrollTrigger) => {
     return gsap.context(() => {
       const heroSection = containerRef.current?.closest('section')
       const isMobile = window.innerWidth < 768
       
-      // Bigger amplitudes, lower frequency for rounder waves
-      const amp1Start = isMobile ? 50 : 90
-      const amp2Start = isMobile ? 40 : 75
-      const amp3Start = isMobile ? 35 : 60
+      // Starting amplitudes
+      const amp1Start = isMobile ? 80 : 140
+      const amp2Start = isMobile ? 60 : 110
+      const amp3Start = isMobile ? 45 : 85
       
-      // Frequency for ~10 waves across the width (1440px)
+      // Base frequency for ~10 waves
       const waveFreq = 2.5
       
-      // Phase offsets spaced apart by ~120 degrees (1/3 of wave cycle) for dynamic layering
+      // Different phase offsets for each layer
       const phase1 = 0
-      const phase2 = 120
-      const phase3 = 240
-      
-      // Animate wave paths from high amplitude to flat as user scrolls
-      // Wave 1 - back layer (tallest)
+      const phase2 = 50
+      const phase3 = 100
+
+      // Animate wave 1 - back layer with horizontal flow
       gsap.fromTo(
         wave1Ref.current,
-        { attr: { d: generateWavePath(amp1Start, waveFreq, phase1) } },
+        { attr: { d: generateWavePath(amp1Start, waveFreq, phase1, seeds[0]) } },
         {
-          attr: { d: generateWavePath(5, waveFreq, phase1) },
+          attr: { d: generateWavePath(8, waveFreq, phase1 + 180, seeds[0]) },
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroSection,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1.5,
+          },
+        }
+      )
+
+      // Animate wave 2 - middle layer
+      gsap.fromTo(
+        wave2Ref.current,
+        { attr: { d: generateWavePath(amp2Start, waveFreq, phase2, seeds[1]) } },
+        {
+          attr: { d: generateWavePath(6, waveFreq, phase2 + 240, seeds[1]) },
           ease: 'none',
           scrollTrigger: {
             trigger: heroSection,
@@ -62,12 +102,12 @@ export default function WaveDivider() {
         }
       )
 
-      // Wave 2 - middle layer
+      // Animate wave 3 - front layer
       gsap.fromTo(
-        wave2Ref.current,
-        { attr: { d: generateWavePath(amp2Start, waveFreq, phase2) } },
+        wave3Ref.current,
+        { attr: { d: generateWavePath(amp3Start, waveFreq, phase3, seeds[2]) } },
         {
-          attr: { d: generateWavePath(4, waveFreq, phase2) },
+          attr: { d: generateWavePath(4, waveFreq, phase3 + 300, seeds[2]) },
           ease: 'none',
           scrollTrigger: {
             trigger: heroSection,
@@ -78,25 +118,14 @@ export default function WaveDivider() {
         }
       )
 
-      // Wave 3 - front layer (shortest but most opaque)
-      gsap.fromTo(
-        wave3Ref.current,
-        { attr: { d: generateWavePath(amp3Start, waveFreq, phase3) } },
-        {
-          attr: { d: generateWavePath(3, waveFreq, phase3) },
-          ease: 'none',
-          scrollTrigger: {
-            trigger: heroSection,
-            start: 'top top',
-            end: 'bottom top',
-            scrub: 0.8,
-          },
-        }
-      )
-
       ScrollTrigger.refresh()
     }, containerRef)
   })
+
+  // Initial wave paths
+  const initialWave1 = generateWavePath(140, 2.5, 0, seeds[0])
+  const initialWave2 = generateWavePath(110, 2.5, 50, seeds[1])
+  const initialWave3 = generateWavePath(85, 2.5, 100, seeds[2])
 
   return (
     <div
@@ -109,22 +138,22 @@ export default function WaveDivider() {
         preserveAspectRatio="none"
         className="absolute inset-0 w-full h-full"
       >
-        {/* Layered waves - spaced 120 degrees apart for dynamic visual separation */}
+        {/* Layered waves - organic spacing, always connected at base */}
         <path
           ref={wave1Ref}
-          d={generateWavePath(90, 2.5, 0)}
+          d={initialWave1}
           fill="rgba(196, 214, 180, 0.35)"
           className="will-change-[d]"
         />
         <path
           ref={wave2Ref}
-          d={generateWavePath(75, 2.5, 120)}
+          d={initialWave2}
           fill="rgba(196, 214, 180, 0.6)"
           className="will-change-[d]"
         />
         <path
           ref={wave3Ref}
-          d={generateWavePath(60, 2.5, 240)}
+          d={initialWave3}
           fill="#c4d6b4"
           className="will-change-[d]"
         />
