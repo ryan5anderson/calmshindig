@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { BLUR_PLACEHOLDER } from '@/lib/placeholder'
 import { useGSAP } from '@/hooks/useGSAP'
 import { SCRUB_INERTIA } from '@/lib/motion'
+import WaveDivider from '@/components/WaveDivider'
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -140,13 +141,18 @@ export default function Hero() {
 
       {/* Scroll indicator */}
       <div
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-0 animate-fade-up-delay-3"
+        className="absolute bottom-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-0 animate-fade-up-delay-3"
         aria-hidden
       >
         <span className="text-cream/80 text-[0.6rem] font-sans font-semibold tracking-[0.25em] uppercase drop-shadow-sm">
           Scroll
         </span>
         <div className="scroll-indicator w-0.5 h-10 rounded-full bg-gradient-to-b from-cream/90 to-cream/15" />
+      </div>
+
+      {/* Wave transition at bottom of hero */}
+      <div className="absolute bottom-0 left-0 right-0 w-full">
+        <WaveDivider />
       </div>
     </section>
   )

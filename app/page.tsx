@@ -1,7 +1,6 @@
 import SkipLink from '@/components/SkipLink'
 import Nav from '@/components/Nav'
 import Hero from '@/components/Hero'
-import WaveDivider from '@/components/WaveDivider'
 import PerformanceInfo from '@/components/PerformanceInfo'
 import SpotlightArtists from '@/components/SpotlightArtists'
 import SupportingSounds from '@/components/SupportingSounds'
@@ -18,7 +17,6 @@ export default function Home() {
       <Nav />
       <main id="main-content">
         <Hero />
-        <WaveDivider />
         <PerformanceInfo />
         <SpotlightArtists />
         <SupportingSounds />

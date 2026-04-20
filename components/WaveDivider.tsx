@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import { useGSAP } from '@/hooks/useGSAP'
 
 export default function WaveDivider() {
@@ -9,24 +9,22 @@ export default function WaveDivider() {
 
   useGSAP((gsap, ScrollTrigger) => {
     return gsap.context(() => {
-      const pathElements = waveRef.current?.querySelectorAll('path')
-      if (!pathElements) return
-
-      pathElements.forEach((path, index) => {
-        const delay = index * 0.05
-        gsap.to(path, {
-          attr: { d: generateWavePath(20 + index * 8) },
+      // Animate the wave container upward as user scrolls
+      gsap.fromTo(
+        containerRef.current,
+        { yPercent: 0 },
+        {
+          yPercent: -100,
           ease: 'none',
           scrollTrigger: {
-            trigger: containerRef.current,
-            start: 'top center',
-            end: 'bottom center',
-            scrub: 1,
+            trigger: containerRef.current?.parentElement, // Hero section is the trigger
+            start: 'top top',
+            end: 'bottom top',
+            scrub: true,
             markers: false,
           },
-          delay,
-        })
-      })
+        }
+      )
 
       ScrollTrigger.refresh()
     }, containerRef)
