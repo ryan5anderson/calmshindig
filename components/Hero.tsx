@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { BLUR_PLACEHOLDER } from '@/lib/placeholder'
 import { useGSAP } from '@/hooks/useGSAP'
 import { SCRUB_INERTIA } from '@/lib/motion'
+import WaveDivider from '@/components/WaveDivider'
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -114,7 +115,7 @@ export default function Hero() {
       />
 
       {/* Hero copy tilts gently; CTAs stay level */}
-      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto pb-24">
+      <div className="relative z-10 text-center px-4 sm:px-6 w-full max-w-4xl mx-auto pb-16 md:pb-24">
         <div ref={contentRef} className="will-change-transform">
           <p
             className="text-dusty-rose font-sans text-[0.65rem] font-bold tracking-[0.3em] uppercase mb-7 opacity-0 animate-fade-up"
@@ -123,8 +124,8 @@ export default function Hero() {
             calm shindig
           </p>
 
-          <h1 className="font-serif text-5xl sm:text-6xl lg:text-[4.5rem] leading-[1.05] text-cream mb-10 opacity-0 animate-fade-up-delay">
-            The intimate live&nbsp;performance series disguised as a backyard kickback
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] leading-[1.1] sm:leading-[1.05] text-cream mb-8 sm:mb-10 opacity-0 animate-fade-up-delay text-balance">
+            The intimate live performance series disguised as a backyard kickback
           </h1>
         </div>
 
@@ -138,15 +139,20 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator - hidden on mobile */}
       <div
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-0 animate-fade-up-delay-3"
+        className="hidden md:flex absolute bottom-32 left-1/2 -translate-x-1/2 flex-col items-center gap-2 opacity-0 animate-fade-up-delay-3"
         aria-hidden
       >
         <span className="text-cream/80 text-[0.6rem] font-sans font-semibold tracking-[0.25em] uppercase drop-shadow-sm">
           Scroll
         </span>
         <div className="scroll-indicator w-0.5 h-10 rounded-full bg-gradient-to-b from-cream/90 to-cream/15" />
+      </div>
+
+      {/* Wave transition at bottom of hero */}
+      <div className="absolute bottom-0 left-0 right-0 w-full">
+        <WaveDivider />
       </div>
     </section>
   )
