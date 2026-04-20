@@ -37,13 +37,16 @@ export default function WaveDivider() {
       const amp2Start = isMobile ? 40 : 75
       const amp3Start = isMobile ? 35 : 60
       
+      // Frequency for ~10 waves across the width (1440px)
+      const waveFreq = 2.5
+      
       // Animate wave paths from high amplitude to flat as user scrolls
-      // Wave 1 - back layer (widest, slowest wave)
+      // Wave 1 - back layer
       gsap.fromTo(
         wave1Ref.current,
-        { attr: { d: generateWavePath(amp1Start, 0.25, 0) } },
+        { attr: { d: generateWavePath(amp1Start, waveFreq, 0) } },
         {
-          attr: { d: generateWavePath(5, 0.25, 0) },
+          attr: { d: generateWavePath(5, waveFreq, 0) },
           ease: 'none',
           scrollTrigger: {
             trigger: heroSection,
@@ -57,9 +60,9 @@ export default function WaveDivider() {
       // Wave 2 - middle layer
       gsap.fromTo(
         wave2Ref.current,
-        { attr: { d: generateWavePath(amp2Start, 0.35, 90) } },
+        { attr: { d: generateWavePath(amp2Start, waveFreq, 30) } },
         {
-          attr: { d: generateWavePath(4, 0.35, 90) },
+          attr: { d: generateWavePath(4, waveFreq, 30) },
           ease: 'none',
           scrollTrigger: {
             trigger: heroSection,
@@ -73,9 +76,9 @@ export default function WaveDivider() {
       // Wave 3 - front layer
       gsap.fromTo(
         wave3Ref.current,
-        { attr: { d: generateWavePath(amp3Start, 0.45, 180) } },
+        { attr: { d: generateWavePath(amp3Start, waveFreq, 60) } },
         {
-          attr: { d: generateWavePath(3, 0.45, 180) },
+          attr: { d: generateWavePath(3, waveFreq, 60) },
           ease: 'none',
           scrollTrigger: {
             trigger: heroSection,
@@ -104,19 +107,19 @@ export default function WaveDivider() {
         {/* Layered waves - start with high amplitude, flatten on scroll */}
         <path
           ref={wave1Ref}
-          d={generateWavePath(90, 0.25, 0)}
+          d={generateWavePath(90, 2.5, 0)}
           fill="rgba(196, 214, 180, 0.4)"
           className="will-change-[d]"
         />
         <path
           ref={wave2Ref}
-          d={generateWavePath(75, 0.35, 90)}
+          d={generateWavePath(75, 2.5, 30)}
           fill="rgba(196, 214, 180, 0.7)"
           className="will-change-[d]"
         />
         <path
           ref={wave3Ref}
-          d={generateWavePath(60, 0.45, 180)}
+          d={generateWavePath(60, 2.5, 60)}
           fill="#c4d6b4"
           className="will-change-[d]"
         />
