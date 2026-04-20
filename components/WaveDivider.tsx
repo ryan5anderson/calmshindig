@@ -40,13 +40,18 @@ export default function WaveDivider() {
       // Frequency for ~10 waves across the width (1440px)
       const waveFreq = 2.5
       
+      // Phase offsets spaced apart by ~120 degrees (1/3 of wave cycle) for dynamic layering
+      const phase1 = 0
+      const phase2 = 120
+      const phase3 = 240
+      
       // Animate wave paths from high amplitude to flat as user scrolls
-      // Wave 1 - back layer
+      // Wave 1 - back layer (tallest)
       gsap.fromTo(
         wave1Ref.current,
-        { attr: { d: generateWavePath(amp1Start, waveFreq, 0) } },
+        { attr: { d: generateWavePath(amp1Start, waveFreq, phase1) } },
         {
-          attr: { d: generateWavePath(5, waveFreq, 0) },
+          attr: { d: generateWavePath(5, waveFreq, phase1) },
           ease: 'none',
           scrollTrigger: {
             trigger: heroSection,
@@ -60,9 +65,9 @@ export default function WaveDivider() {
       // Wave 2 - middle layer
       gsap.fromTo(
         wave2Ref.current,
-        { attr: { d: generateWavePath(amp2Start, waveFreq, 30) } },
+        { attr: { d: generateWavePath(amp2Start, waveFreq, phase2) } },
         {
-          attr: { d: generateWavePath(4, waveFreq, 30) },
+          attr: { d: generateWavePath(4, waveFreq, phase2) },
           ease: 'none',
           scrollTrigger: {
             trigger: heroSection,
@@ -73,12 +78,12 @@ export default function WaveDivider() {
         }
       )
 
-      // Wave 3 - front layer
+      // Wave 3 - front layer (shortest but most opaque)
       gsap.fromTo(
         wave3Ref.current,
-        { attr: { d: generateWavePath(amp3Start, waveFreq, 60) } },
+        { attr: { d: generateWavePath(amp3Start, waveFreq, phase3) } },
         {
-          attr: { d: generateWavePath(3, waveFreq, 60) },
+          attr: { d: generateWavePath(3, waveFreq, phase3) },
           ease: 'none',
           scrollTrigger: {
             trigger: heroSection,
@@ -104,22 +109,22 @@ export default function WaveDivider() {
         preserveAspectRatio="none"
         className="absolute inset-0 w-full h-full"
       >
-        {/* Layered waves - start with high amplitude, flatten on scroll */}
+        {/* Layered waves - spaced 120 degrees apart for dynamic visual separation */}
         <path
           ref={wave1Ref}
           d={generateWavePath(90, 2.5, 0)}
-          fill="rgba(196, 214, 180, 0.4)"
+          fill="rgba(196, 214, 180, 0.35)"
           className="will-change-[d]"
         />
         <path
           ref={wave2Ref}
-          d={generateWavePath(75, 2.5, 30)}
-          fill="rgba(196, 214, 180, 0.7)"
+          d={generateWavePath(75, 2.5, 120)}
+          fill="rgba(196, 214, 180, 0.6)"
           className="will-change-[d]"
         />
         <path
           ref={wave3Ref}
-          d={generateWavePath(60, 2.5, 60)}
+          d={generateWavePath(60, 2.5, 240)}
           fill="#c4d6b4"
           className="will-change-[d]"
         />
