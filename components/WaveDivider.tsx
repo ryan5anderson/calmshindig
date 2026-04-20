@@ -34,14 +34,20 @@ export default function WaveDivider() {
   useGSAP((gsap, ScrollTrigger) => {
     return gsap.context(() => {
       const heroSection = containerRef.current?.closest('section')
+      const isMobile = window.innerWidth < 768
+      
+      // Reduced amplitudes on mobile
+      const amp1Start = isMobile ? 35 : 70
+      const amp2Start = isMobile ? 28 : 55
+      const amp3Start = isMobile ? 22 : 45
       
       // Animate wave paths from high amplitude to flat as user scrolls
       // Wave 1 - back layer
       gsap.fromTo(
         wave1Ref.current,
-        { attr: { d: generateWavePath(70, 0.8, 0) } },
+        { attr: { d: generateWavePath(amp1Start, 0.8, 0) } },
         {
-          attr: { d: generateWavePath(8, 0.8, 0) },
+          attr: { d: generateWavePath(4, 0.8, 0) },
           ease: 'none',
           scrollTrigger: {
             trigger: heroSection,
@@ -55,9 +61,9 @@ export default function WaveDivider() {
       // Wave 2 - middle layer
       gsap.fromTo(
         wave2Ref.current,
-        { attr: { d: generateWavePath(55, 1.2, 120) } },
+        { attr: { d: generateWavePath(amp2Start, 1.2, 120) } },
         {
-          attr: { d: generateWavePath(5, 1.2, 120) },
+          attr: { d: generateWavePath(3, 1.2, 120) },
           ease: 'none',
           scrollTrigger: {
             trigger: heroSection,
@@ -71,9 +77,9 @@ export default function WaveDivider() {
       // Wave 3 - front layer
       gsap.fromTo(
         wave3Ref.current,
-        { attr: { d: generateWavePath(45, 1.5, 240) } },
+        { attr: { d: generateWavePath(amp3Start, 1.5, 240) } },
         {
-          attr: { d: generateWavePath(3, 1.5, 240) },
+          attr: { d: generateWavePath(2, 1.5, 240) },
           ease: 'none',
           scrollTrigger: {
             trigger: heroSection,
@@ -91,7 +97,7 @@ export default function WaveDivider() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[200px] pointer-events-none overflow-visible"
+      className="relative w-full h-[100px] md:h-[200px] pointer-events-none overflow-visible"
       aria-hidden
     >
       <svg
