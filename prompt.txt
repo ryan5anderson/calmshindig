@@ -1,0 +1,54 @@
+---
+
+**Act as a senior frontend engineer and UX designer. I need you to redesign my existing website's UI/UX while keeping ALL current sections, content, and information architecture exactly as they are. The goal is to make the experience significantly smoother, more dynamic, and creatively "vibey" without adding or removing any sections.**
+
+**🔹 CURRENT STATE:**
+- All existing sections/pages will remain intact.
+- Content, copy, and layout structure should be preserved.
+
+**🔹 DESIGN & UX GOALS:**
+- Smoothness: Implement fluid scrolling, eased transitions, and buttery section navigation.
+- Dynamism: Add scroll-triggered reveals, hover micro-interactions, parallax/depth effects, and responsive motion that feels alive but never distracting.
+- Creative/Vibey: Use modern atmospheric gradients, subtle texture/lighting effects, expressive typography, and a cohesive motion language that gives the site a distinct mood.
+- Performance-first: All animations must be GPU-accelerated, respect `prefers-reduced-motion`, and never block rendering or hurt Core Web Vitals.
+
+**🔹 TECH STACK:**
+- Framework: **Next.js 14** (App Router)
+- Styling: **Tailwind CSS**
+- Animations: **GSAP + ScrollTrigger** (primary), vanilla `IntersectionObserver` + CSS transitions (fallback for lightweight reveals)
+- Images: **next/image** with blur placeholders and lazy loading
+- Hosting: **Vercel**
+
+**🔹 IMPLEMENTATION GUIDANCE:**
+- Use GSAP ScrollTrigger for pinned scroll sections, parallax depth effects, and any timeline-based entrance animations.
+- Use `IntersectionObserver` + Tailwind CSS transition classes for simple section reveals (no GSAP needed for these).
+- Enhance via CSS classes, JS event listeners, and progressive enhancement — keep DOM structure intact.
+- All GSAP animations must use `will-change: transform` and `transform`/`opacity` only (GPU-accelerated).
+- Wrap all GSAP and ScrollTrigger logic in `useEffect` with proper cleanup (`ctx.revert()`).
+- Respect `prefers-reduced-motion` — gate all animations behind a media query check.
+- Ensure full responsiveness, accessibility (WCAG AA), and SEO preservation.
+
+**🔹 DESIGN TOKENS:**
+- Vibe: Warm & intimate — earthy tones, film grain texture, analog/backyard feel
+- Logo colors and fonts preserved exactly as-is
+- Typography: DM Serif Display (headings) + DM Sans (body)
+- Core palette: `--earth-dark: #1C1510`, `--cream: #F5F0E8`, `--amber: #C8832A`, `--amber-light: #E8A84A`, `--sage: #7A8C6E`, `--rust: #A0432A`
+- Easing: `cubic-bezier(0.22, 1, 0.36, 1)` (smooth), `cubic-bezier(0.34, 1.56, 0.64, 1)` (bounce)
+- Film grain overlay: SVG filter via CSS `::before` pseudo-element, zero JS
+
+**🔹 EXPECTED OUTPUT:**
+1. A phased implementation plan (setup → animations/styling → polish → performance tuning).
+2. Specific code snippets for key interactions: smooth scroll, GSAP ScrollTrigger section reveals, hover micro-interactions, page transitions using Next.js View Transitions.
+3. The full CSS custom property / design token system.
+4. A performance & accessibility checklist tailored to GSAP + Next.js.
+5. File-by-file instructions for where to place code in the Next.js App Router structure (`app/layout.tsx`, `app/page.tsx`, `components/`, `styles/globals.css`, etc.).
+
+**⚠️ CONSTRAINTS:**
+- DO NOT remove, rename, or restructure existing sections.
+- GSAP is justified as the sole heavy library — provide `IntersectionObserver` + CSS as a fallback for any GSAP-only effect where possible.
+- Prioritize 60fps animations, sub-3s LCP, and minimal bundle impact.
+- Load GSAP and ScrollTrigger only on the client (`'use client'` + dynamic import or `useEffect`).
+
+---
+Reference the event series HTML file for what my website looks like right now.
+```

@@ -1,0 +1,647 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  /* Backgrounds & surfaces */
+  --cream: #F5F0EB;          /* off-white page background */
+  --earth-dark: #384428;     /* dark forest green — text, nav, footer */
+
+  /* Accent palette */
+  --sage: #7E9B72;           /* sage green — primary accent / CTAs */
+  --sage-light: #9BB88B;     /* lighter sage — hover states */
+  --dusty-rose: #C8B5AD;     /* dusty pink — warm secondary accent */
+
+  /* Aliases (kept for compatibility) */
+  --amber: var(--sage);
+  --amber-light: var(--sage-light);
+  --rust: var(--dusty-rose);
+
+  /* Easing — slightly softer deceleration for scroll reveals */
+  --ease-smooth: cubic-bezier(0.2, 0.95, 0.25, 1);
+  --ease-bounce: cubic-bezier(0.33, 1.52, 0.62, 1);
+
+  /* Typography — Google Fonts linked from app/layout.tsx (browser load; does not block next dev) */
+  --font-serif: 'DM Serif Display', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--earth-dark);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   FILM GRAIN OVERLAY (zero JS, SVG filter via CSS ::before)
+   ============================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+/* ============================================================
+   SCROLL REVEAL — IntersectionObserver driven
+   ============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.82s var(--ease-smooth),
+    transform 0.82s var(--ease-smooth);
+  will-change: transform, opacity;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.7s var(--ease-smooth),
+    transform 0.7s var(--ease-smooth);
+  will-change: transform, opacity;
+}
+
+.reveal-stagger.is-visible > * { opacity: 1; transform: translateY(0); }
+.reveal-stagger.is-visible > *:nth-child(1)  { transition-delay: 0ms; }
+.reveal-stagger.is-visible > *:nth-child(2)  { transition-delay: 85ms; }
+.reveal-stagger.is-visible > *:nth-child(3)  { transition-delay: 170ms; }
+.reveal-stagger.is-visible > *:nth-child(4)  { transition-delay: 255ms; }
+.reveal-stagger.is-visible > *:nth-child(5)  { transition-delay: 340ms; }
+.reveal-stagger.is-visible > *:nth-child(6)  { transition-delay: 425ms; }
+.reveal-stagger.is-visible > *:nth-child(7)  { transition-delay: 510ms; }
+.reveal-stagger.is-visible > *:nth-child(8)  { transition-delay: 595ms; }
+.reveal-stagger.is-visible > *:nth-child(9)  { transition-delay: 680ms; }
+.reveal-stagger.is-visible > *:nth-child(10) { transition-delay: 765ms; }
+.reveal-stagger.is-visible > *:nth-child(11) { transition-delay: 850ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-stagger > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+/* Light blur — used when scrolled past hero onto cream sections */
+.nav-blur {
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  background: rgba(245, 240, 235, 0.88);
+  border-bottom: 1px solid rgba(56, 68, 40, 0.08);
+  box-shadow: 0 1px 20px rgba(56, 68, 40, 0.06);
+}
+
+/* Dark blur — used inside the hero / on dark sections */
+.nav-blur-dark {
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  background: rgba(56, 68, 40, 0.82);
+  border-bottom: 1px solid rgba(245, 240, 235, 0.08);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--earth-dark);
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.875rem 2.5rem;
+  border-radius: 2px;
+  text-decoration: none;
+  transition:
+    background 0.35s var(--ease-smooth),
+    transform 0.35s var(--ease-bounce),
+    box-shadow 0.35s var(--ease-smooth);
+  will-change: transform;
+}
+
+.btn-primary:hover {
+  background: var(--sage);
+  transform: translateY(-3px) rotate(-0.65deg) scale(1.02);
+  box-shadow: 0 10px 28px rgba(56, 68, 40, 0.2);
+}
+
+.btn-primary:active { transform: translateY(-1px) rotate(0.2deg) scale(1.01); }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(56, 68, 40, 0.25);
+  color: var(--earth-dark);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.75rem 2rem;
+  border-radius: 2px;
+  text-decoration: none;
+  transition:
+    border-color 0.3s var(--ease-smooth),
+    background 0.3s var(--ease-smooth),
+    color 0.3s var(--ease-smooth),
+    transform 0.3s var(--ease-bounce);
+  will-change: transform;
+}
+
+.btn-outline:hover {
+  border-color: var(--sage);
+  background: rgba(126, 155, 114, 0.1);
+  color: var(--earth-dark);
+  transform: translateY(-2px) rotate(0.45deg) scale(1.015);
+}
+
+/* Outline variant for use on dark backgrounds (hero) */
+.btn-outline-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(245, 240, 235, 0.35);
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.75rem 2rem;
+  border-radius: 2px;
+  text-decoration: none;
+  transition:
+    border-color 0.3s var(--ease-smooth),
+    background 0.3s var(--ease-smooth),
+    transform 0.3s var(--ease-bounce);
+  will-change: transform;
+}
+
+.btn-outline-light:hover {
+  border-color: rgba(245, 240, 235, 0.7);
+  background: rgba(245, 240, 235, 0.1);
+  transform: translateY(-2px) rotate(-0.5deg) scale(1.015);
+}
+
+/* Primary variant for dark backgrounds (hero) */
+.btn-primary-light {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--cream);
+  color: var(--earth-dark);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.875rem 2.5rem;
+  border-radius: 2px;
+  text-decoration: none;
+  transition:
+    background 0.35s var(--ease-smooth),
+    transform 0.35s var(--ease-bounce),
+    box-shadow 0.35s var(--ease-smooth);
+  will-change: transform;
+}
+
+.btn-primary-light:hover {
+  background: #fff;
+  transform: translateY(-3px) rotate(0.55deg) scale(1.02);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary-light:active { transform: translateY(-1px) rotate(-0.15deg) scale(1.01); }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary,
+  .btn-outline,
+  .btn-outline-light,
+  .btn-primary-light {
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .btn-primary:hover,
+  .btn-outline:hover,
+  .btn-outline-light:hover,
+  .btn-primary-light:hover {
+    transform: none;
+  }
+}
+
+/* ============================================================
+   LINK UNDERLINE HOVER
+   ============================================================ */
+.link-hover {
+  position: relative;
+  text-decoration: none;
+}
+
+.link-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--sage);
+  transition: width 0.35s var(--ease-smooth);
+}
+
+.link-hover:hover::after { width: 100%; }
+
+/* Cream variant for dark backgrounds */
+.link-hover-light::after {
+  background: var(--cream);
+}
+
+/* ============================================================
+   IMAGE HOVER ZOOM
+   ============================================================ */
+.img-zoom {
+  overflow: hidden;
+}
+
+.img-zoom img {
+  transition: transform 0.7s var(--ease-smooth);
+  will-change: transform;
+}
+
+.img-zoom:hover img {
+  transform: scale(1.07);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .img-zoom img { transition: none; }
+}
+
+/* ============================================================
+   ARTIST CARD
+   ============================================================ */
+.artist-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+  cursor: pointer;
+  background: rgba(56, 68, 40, 0.05);
+  border: 1px solid rgba(56, 68, 40, 0.1);
+  transition:
+    border-color 0.4s var(--ease-smooth),
+    box-shadow 0.4s var(--ease-smooth),
+    transform 0.4s var(--ease-bounce);
+}
+
+.artist-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(56, 68, 40, 0.85) 0%,
+    rgba(56, 68, 40, 0.2) 55%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+.artist-card:hover {
+  border-color: rgba(126, 155, 114, 0.35);
+  box-shadow: 0 8px 32px rgba(56, 68, 40, 0.15);
+  transform: translateY(-4px) perspective(900px) rotateX(0.6deg) rotateY(-1.1deg);
+}
+
+.artist-card img {
+  transition: transform 0.7s var(--ease-smooth);
+  will-change: transform;
+}
+
+.artist-card:hover img {
+  transform: scale(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artist-card img { transition: none; }
+  .artist-card:hover { transform: none; box-shadow: none; }
+}
+
+/* ============================================================
+   SECTION BACKGROUNDS (light-theme versions)
+   ============================================================ */
+
+/* Sage-tint sections — saturated enough to read against cream (#F5F0EB) and hero fade */
+.section-sage-tint {
+  background-color: #c4d6b4;
+}
+
+/* Pure cream */
+.section-cream {
+  background-color: var(--cream);
+}
+
+/* Subtle dusty rose tint */
+.section-rose-tint {
+  background-color: #F3EDEA;
+}
+
+/* Dark forest green section (hero, footer) */
+.section-dark {
+  background-color: var(--earth-dark);
+  color: var(--cream);
+}
+
+/* Section dividers */
+.section-divider {
+  border-top: 1px solid rgba(56, 68, 40, 0.08);
+}
+
+/* ============================================================
+   SCROLL FLOW BRIDGE — scroll-scrubbed transitions between sections
+   Tall outer track + sticky inner stage; motion driven by GSAP ScrollTrigger only.
+   ============================================================ */
+.scroll-flow-bridge {
+  position: relative;
+  width: 100%;
+  /* ~35–55vh of pinned scrub per bridge; 8 bridges stay usable on the page */
+  min-height: 135vh;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.scroll-flow-bridge__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  width: 100%;
+}
+
+.scroll-flow-bridge__stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  will-change: clip-path;
+}
+
+.scroll-flow-bridge__shards {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  z-index: 0;
+}
+
+.sfb-shard {
+  flex: 1;
+  min-width: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.scroll-flow-bridge__waves {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 52%;
+  min-height: 12rem;
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+}
+
+.scroll-flow-bridge__wave-group {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.sfb-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  transform-origin: 50% 40%;
+  will-change: opacity, transform;
+}
+
+@media (min-width: 1024px) {
+  .scroll-flow-bridge {
+    min-height: 155vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-flow-bridge {
+    min-height: 5rem;
+  }
+
+  .scroll-flow-bridge__sticky {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 5rem;
+  }
+
+  .scroll-flow-bridge__stage {
+    clip-path: none !important;
+    min-height: 5rem;
+  }
+
+  .scroll-flow-bridge__panel {
+    clip-path: none !important;
+    transform: none !important;
+  }
+
+  .scroll-flow-bridge__waves {
+    height: 70%;
+    min-height: 3.5rem;
+  }
+
+  .sfb-veil {
+    opacity: 0 !important;
+  }
+
+  .scroll-flow-bridge__shards,
+  .scroll-flow-bridge__wave-group,
+  .sfb-shard {
+    will-change: auto;
+  }
+}
+
+/* Motion system — GPU-friendly layers (GSAP-driven) */
+.motion-parallax-gpu {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-parallax-gpu {
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .motion-wave-reveal {
+    clip-path: none !important;
+    transform: none !important;
+    will-change: auto;
+  }
+}
+
+/* ============================================================
+   DIVIDER / ORNAMENT
+   ============================================================ */
+.divider-sage {
+  width: 40px;
+  height: 2px;
+  background: var(--sage);
+  margin-bottom: 1.5rem;
+}
+
+/* Alias */
+.divider-amber {
+  width: 40px;
+  height: 2px;
+  background: var(--sage);
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================================
+   TAG / LABEL
+   ============================================================ */
+.tag {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sage);
+  padding: 0.25rem 0.75rem;
+  border: 1px solid rgba(126, 155, 114, 0.4);
+  border-radius: 2px;
+}
+
+/* ============================================================
+   GALLERY HOVER
+   ============================================================ */
+.gallery-item {
+  overflow: hidden;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.gallery-item img {
+  transition: transform 0.65s var(--ease-smooth), filter 0.65s var(--ease-smooth);
+  will-change: transform;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.06) rotate(0.4deg);
+  filter: brightness(1.06) saturate(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-item img { transition: none; }
+}
+
+/* ============================================================
+   CONTACT FORM
+   ============================================================ */
+.input-field {
+  width: 100%;
+  background: rgba(56, 68, 40, 0.04);
+  border: 1.5px solid rgba(56, 68, 40, 0.15);
+  border-radius: 2px;
+  color: var(--earth-dark);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  padding: 0.875rem 1rem;
+  outline: none;
+  transition:
+    border-color 0.3s var(--ease-smooth),
+    background 0.3s var(--ease-smooth);
+}
+
+.input-field:focus {
+  border-color: var(--sage);
+  background: rgba(126, 155, 114, 0.06);
+}
+
+.input-field::placeholder {
+  color: rgba(56, 68, 40, 0.35);
+}
+
+.input-field option {
+  background: var(--cream);
+  color: var(--earth-dark);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer-link {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: rgba(245, 240, 235, 0.5);
+  text-decoration: none;
+  transition: color 0.3s var(--ease-smooth);
+}
+
+.footer-link:hover { color: var(--cream); }
+
+/* ============================================================
+   SCROLL INDICATOR
+   ============================================================ */
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+
+.scroll-indicator {
+  animation: scrollBounce 1.8s var(--ease-smooth) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-indicator { animation: none; opacity: 0.5; }
+}
