@@ -1,14 +1,15 @@
 import Image from 'next/image'
 import { BLUR_PLACEHOLDER } from '@/lib/placeholder'
 import ScrollReveal from './ScrollReveal'
+import SageCreamWaveBridge from './SageCreamWaveBridge'
 
 export default function PerformanceInfo() {
   return (
     <section
-      className="section-sage-tint py-28 lg:py-36 px-6"
+      className="section-sage-tint relative pt-28 lg:pt-36 px-6 pb-0 overflow-x-clip"
       aria-labelledby="performance-heading"
     >
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 lg:gap-24 items-center pb-24 lg:pb-28">
         {/* Text block */}
         <ScrollReveal>
           <div>
@@ -94,6 +95,7 @@ export default function PerformanceInfo() {
           </div>
         </ScrollReveal>
       </div>
+      <SageCreamWaveBridge />
     </section>
   )
 }
