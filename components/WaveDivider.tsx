@@ -62,8 +62,8 @@ export default function WaveDivider() {
       const amp2Start = isMobile ? 60 : 110
       const amp3Start = isMobile ? 45 : 85
       
-      // Base frequency for ~10 waves
-      const waveFreq = 2.5
+      // Lower frequency for ~5 wider, more spaced out waves
+      const waveFreq = 1.2
       
       // Different phase offsets for each layer
       const phase1 = 0
@@ -122,10 +122,10 @@ export default function WaveDivider() {
     }, containerRef)
   })
 
-  // Initial wave paths
-  const initialWave1 = generateWavePath(140, 2.5, 0, seeds[0])
-  const initialWave2 = generateWavePath(110, 2.5, 50, seeds[1])
-  const initialWave3 = generateWavePath(85, 2.5, 100, seeds[2])
+  // Initial wave paths - lower frequency for wider, more spaced waves
+  const initialWave1 = generateWavePath(140, 1.2, 0, seeds[0])
+  const initialWave2 = generateWavePath(110, 1.2, 50, seeds[1])
+  const initialWave3 = generateWavePath(85, 1.2, 100, seeds[2])
 
   return (
     <div
